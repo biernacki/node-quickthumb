@@ -3,35 +3,25 @@ var express = require('express'),
     qt = require('../'),
     filename = 'cape cod.jpg';
 
-
-// Crop
-app.use('/public/crop', qt.static(__dirname + '/../public', {
-    cacheDir : '/tmp/cache',
-    quality : .95
-}));
 // Resize
-app.use('/public/resize', qt.static(__dirname + '/../public', {
-    type : 'resize',
-}));
+app.use('/public', qt.static(__dirname + '/../public'));
 
 
 app.get('/', function(req, res){
-    var types = [ 'crop', 'resize' ];
 
-    function img(type,q){
-        var src = '/public/' + ( type ? type + '/' : '' ) + 'images/' + filename + q;
+    function img(dim){
+        var src = '/public/images/' + filename + dim;
         return '<img src="' + src + '" title="' + src + '" />';
     }
 
     var h = '<center>';
-    types.forEach(function(type){
-        h += '<br />' + type + '<br />';
-        [ '200', '100x100', 'x60', '35', '10x10', 'x35', '60', '100x150', 'x200' ].forEach(function(dim){
-            h += img(type, '?dim=' + dim) + '&nbsp;';
-        });
-        h += '<br />' + img(type, '?dim=800x100') + '<br />';
+    
+    h += '<br />';
+    [ '200', '100x100', 'x60', '35', '10x10', 'x35', '60', '100x150', 'x200' ].forEach(function(dim){
+        h += img('?dim=' + dim) + '&nbsp;';
     });
-    h += '<br />original<br />' + img('crop','') + '</center>';
+    h += '<br />' + img('?dim=800x100') + '<br />';
+    h += '<br />original<br />' + img('') + '</center>';
     res.send(h);
 });
 
